@@ -1,0 +1,17 @@
+project_name   = "static-site"
+environment    = "dev"
+aws_region     = "ap-south-1"
+
+# Your Route53 zone (must exist) and domain
+hosted_zone_name = "example.com"
+domain_name      = "example.com"
+
+# Create www alias too?
+create_www = true
+
+# Upload local site files (put content in ../../site)
+upload_enabled = false
+site_dir       = "../../site"
+
+# CloudFront price class
+price_class = "PriceClass_100"
