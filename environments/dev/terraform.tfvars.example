@@ -3,8 +3,8 @@ environment    = "dev"
 aws_region     = "ap-south-1"
 
 # Your Route53 zone (must exist) and domain
-hosted_zone_name = "example.com"
-domain_name      = "example.com"
+hosted_zone_name = "iamanilk.space"
+domain_name      = "iamanilk.space"
 
 # Create www alias too?
 create_www = true

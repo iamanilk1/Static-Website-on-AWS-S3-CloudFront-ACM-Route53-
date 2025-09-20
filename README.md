@@ -1,6 +1,6 @@
 # Scenario 3 — Static Website on AWS (S3 + CloudFront + ACM + Route53)
 
-This scenario provides a reusable, service-wise Terraform module setup and an example `dev` environment that deploys a secure, scalable static website:
+This scenario provides a reusable, service-wise Terraform module setup and an example `dev` environment that deploys a secure, scalable static website (primary region defaults to ap-south-1):
 
 - S3 bucket for website content (private)
 - CloudFront distribution with Origin Access Control (OAC) to read from S3
@@ -38,6 +38,7 @@ terraform apply -auto-approve
 When finished, outputs will show your CloudFront domain and the website URL.
 
 Notes:
+- Primary region for regional services (S3, Route53 interactions, state backend) defaults to `ap-south-1`.
 - ACM and CloudFront must be created in `us-east-1`. The dev environment config already provides the alias provider for that.
 - The S3 bucket is private and only readable via CloudFront (OAC). Accessing the bucket URL directly will be blocked.
 - If `upload_enabled = true`, the module will upload all files from `site_dir` to S3 using `aws_s3_object`.

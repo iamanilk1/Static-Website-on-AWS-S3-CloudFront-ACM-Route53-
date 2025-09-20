@@ -5,13 +5,16 @@ locals {
 module "acm" {
   source           = "../../modules/services/acm"
   providers = {
+  aws           = aws
     aws.us_east_1 = aws.us_east_1
   }
 
   domain_name      = var.domain_name
   hosted_zone_name = var.hosted_zone_name
-  san_enabled      = var.create_www
-  san_names        = var.create_www ? ["www.${var.domain_name}"] : []
+  hosted_zone_id   = var.hosted_zone_id
+  create_zone      = var.create_zone
+  san_enabled      = true
+  san_names        = ["*.${var.domain_name}"]
   tags = {
     Project     = var.project_name
     Environment = var.environment
@@ -82,6 +85,8 @@ resource "aws_s3_bucket_policy" "oai_policy" {
 module "dns" {
   source           = "../../modules/services/route53"
   hosted_zone_name = var.hosted_zone_name
+  hosted_zone_id   = var.hosted_zone_id
+  create_zone      = var.create_zone
   domain_name      = var.domain_name
   cf_domain_name   = module.cloudfront.domain_name
   cf_hosted_zone_id = module.cloudfront.hosted_zone_id
@@ -97,8 +102,11 @@ module "uploader" {
   depends_on     = [aws_s3_bucket_policy.oai_policy]
 }
 
-output "cloudfront_domain" {
-  value = module.cloudfront.domain_name
+# One-time CloudFront invalidation after content upload
+resource "aws_cloudfront_invalidation" "after_upload" {
+  distribution_id = module.cloudfront.distribution_id
+  paths           = ["/*"]
+  depends_on      = [module.uploader]
 }
 
 output "website_url" {

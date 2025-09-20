@@ -8,6 +8,18 @@ variable "hosted_zone_name" {
   type        = string
 }
 
+variable "hosted_zone_id" {
+  description = "Optional existing Route53 hosted zone id; if set, data lookup is skipped"
+  type        = string
+  default     = null
+}
+
+variable "create_zone" {
+  description = "Create the hosted zone if it does not exist"
+  type        = bool
+  default     = false
+}
+
 variable "san_enabled" {
   description = "Enable SANs"
   type        = bool

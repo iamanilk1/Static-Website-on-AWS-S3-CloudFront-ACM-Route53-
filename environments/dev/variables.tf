@@ -19,11 +19,25 @@ variable "aws_region" {
 variable "domain_name" {
   description = "Apex domain name (e.g., example.com)"
   type        = string
+  default     = "iamanilk.space"
 }
 
 variable "hosted_zone_name" {
   description = "Hosted zone name (e.g., example.com)"
   type        = string
+  default     = "iamanilk.space"
+}
+
+variable "hosted_zone_id" {
+  description = "Optional existing Route53 hosted zone id"
+  type        = string
+  default     = null
+}
+
+variable "create_zone" {
+  description = "Create hosted zone if not found"
+  type        = bool
+  default     = true
 }
 
 variable "create_www" {
@@ -47,5 +61,5 @@ variable "site_dir" {
 variable "upload_enabled" {
   description = "Upload local site_dir to S3"
   type        = bool
-  default     = false
+  default     = true
 }
