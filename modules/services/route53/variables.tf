@@ -4,16 +4,11 @@ variable "hosted_zone_name" {
 }
 
 variable "hosted_zone_id" {
-  description = "Optional existing hosted zone id; if set, data lookup is skipped"
+  description = "Hosted zone id (required)"
   type        = string
-  default     = null
 }
 
-variable "create_zone" {
-  description = "Create the hosted zone if it does not exist"
-  type        = bool
-  default     = false
-}
+// Zone creation and protection are handled by the route53_zone module
 
 variable "domain_name" {
   description = "Domain name for records (apex portion)"

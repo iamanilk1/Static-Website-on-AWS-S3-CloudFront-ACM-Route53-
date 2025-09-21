@@ -2,6 +2,13 @@ locals {
   name_prefix = "${var.project_name}-${var.environment}"
 }
 
+## Ensure the hosted zone exists first (so ACM can create DNS validation records)
+module "dns_zone" {
+  source               = "../../modules/services/route53_zone"
+  hosted_zone_name     = var.hosted_zone_name
+  prevent_zone_destroy = var.prevent_zone_destroy
+}
+
 module "acm" {
   source           = "../../modules/services/acm"
   providers = {
@@ -11,10 +18,11 @@ module "acm" {
 
   domain_name      = var.domain_name
   hosted_zone_name = var.hosted_zone_name
-  hosted_zone_id   = var.hosted_zone_id
-  create_zone      = var.create_zone
+  hosted_zone_id   = var.hosted_zone_id != null ? var.hosted_zone_id : module.dns_zone.zone_id
+  zone_id          = module.dns_zone.zone_id
   san_enabled      = true
   san_names        = ["*.${var.domain_name}"]
+  manage_dns_validation_records = var.manage_dns_validation_records
   tags = {
     Project     = var.project_name
     Environment = var.environment
@@ -37,6 +45,7 @@ module "cloudfront" {
   name                = local.name_prefix
   s3_domain_name      = module.s3.bucket_domain_name
   acm_certificate_arn = module.acm.certificate_arn
+  use_default_certificate = var.manage_dns_validation_records ? false : true
   aliases             = var.create_www ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
   price_class         = var.price_class
   tags = {
@@ -85,12 +94,12 @@ resource "aws_s3_bucket_policy" "oai_policy" {
 module "dns" {
   source           = "../../modules/services/route53"
   hosted_zone_name = var.hosted_zone_name
-  hosted_zone_id   = var.hosted_zone_id
-  create_zone      = var.create_zone
+  hosted_zone_id   = var.hosted_zone_id != null ? var.hosted_zone_id : module.dns_zone.zone_id
   domain_name      = var.domain_name
   cf_domain_name   = module.cloudfront.domain_name
   cf_hosted_zone_id = module.cloudfront.hosted_zone_id
-  create_www       = var.create_www
+  create_apex      = var.manage_dns_validation_records ? var.create_apex : false
+  create_www       = var.manage_dns_validation_records ? var.create_www : false
 }
 
 # Optional upload of static files
@@ -102,11 +111,22 @@ module "uploader" {
   depends_on     = [aws_s3_bucket_policy.oai_policy]
 }
 
-# One-time CloudFront invalidation after content upload
-resource "aws_cloudfront_invalidation" "after_upload" {
-  distribution_id = module.cloudfront.distribution_id
-  paths           = ["/*"]
-  depends_on      = [module.uploader]
+# CloudFront invalidation after content upload (native resource)
+# CloudFront invalidation after content upload using PowerShell (Windows-safe quoting)
+resource "null_resource" "cf_invalidation_after_upload" {
+  count = var.upload_enabled ? 1 : 0
+
+  triggers = {
+    distribution_id = module.cloudfront.distribution_id
+    keys_hash       = md5(join(",", module.uploader.uploaded_keys))
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["PowerShell", "-NoProfile", "-NonInteractive", "-Command"]
+  command     = "$ErrorActionPreference = 'Stop'; $attempts=0; while ($attempts -lt 3) { try { aws cloudfront create-invalidation --distribution-id ${module.cloudfront.distribution_id} --paths '/*'; break } catch { $attempts++; if ($attempts -ge 3) { throw } Start-Sleep -Seconds 10 } }"
+  }
+
+  depends_on = [module.uploader]
 }
 
 output "website_url" {

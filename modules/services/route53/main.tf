@@ -7,21 +7,8 @@ terraform {
   }
 }
 
-resource "aws_route53_zone" "this" {
-  count = var.create_zone && var.hosted_zone_id == null ? 1 : 0
-  name  = var.hosted_zone_name
-}
-
-data "aws_route53_zone" "this" {
-  count        = var.create_zone || var.hosted_zone_id != null ? 0 : 1
-  name         = var.hosted_zone_name
-  private_zone = false
-}
-
 locals {
-  zone_id = var.hosted_zone_id != null ? var.hosted_zone_id : (
-    var.create_zone ? aws_route53_zone.this[0].zone_id : data.aws_route53_zone.this[0].zone_id
-  )
+  zone_id = var.hosted_zone_id
   zone_name = var.hosted_zone_name
 }
 

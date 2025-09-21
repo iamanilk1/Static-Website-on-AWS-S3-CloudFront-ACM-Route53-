@@ -13,6 +13,12 @@ variable "acm_certificate_arn" {
   type        = string
 }
 
+variable "use_default_certificate" {
+  description = "When true, use CloudFront default certificate and no aliases (for first apply before ACM is validated)"
+  type        = bool
+  default     = false
+}
+
 variable "aliases" {
   description = "Custom domain names for CloudFront"
   type        = list(string)

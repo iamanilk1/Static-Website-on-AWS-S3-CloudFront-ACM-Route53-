@@ -14,10 +14,10 @@ variable "hosted_zone_id" {
   default     = null
 }
 
-variable "create_zone" {
-  description = "Create the hosted zone if it does not exist"
-  type        = bool
-  default     = false
+variable "zone_id" {
+  description = "Optional hosted zone id (e.g., from a created module) used when hosted_zone_id is not provided"
+  type        = string
+  default     = null
 }
 
 variable "san_enabled" {
@@ -36,4 +36,10 @@ variable "tags" {
   description = "Tags to apply"
   type        = map(string)
   default     = {}
+}
+
+variable "manage_dns_validation_records" {
+  description = "If true, create Route53 DNS validation records and wait for ACM validation. When false, only request the certificate and output required DNS records."
+  type        = bool
+  default     = true
 }

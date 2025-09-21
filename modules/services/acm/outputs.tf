@@ -1,6 +1,11 @@
 output "certificate_arn" {
-  description = "Validated ACM certificate ARN"
-  value       = aws_acm_certificate_validation.this.certificate_arn
+  description = "ACM certificate ARN (validated ARN when manage_dns_validation_records=true)"
+  value       = var.manage_dns_validation_records ? aws_acm_certificate_validation.this[0].certificate_arn : aws_acm_certificate.this.arn
+}
+
+output "validated" {
+  description = "Whether the module attempted validation via Route53 DNS records"
+  value       = var.manage_dns_validation_records
 }
 
 output "validation_records" {

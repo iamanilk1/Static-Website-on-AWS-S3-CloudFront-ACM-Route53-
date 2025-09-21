@@ -10,9 +10,9 @@ output "certificate_arn" {
   value = module.acm.certificate_arn
 }
 
-output "route53_name_servers" {
-  description = "Name servers for the hosted zone (if Terraform created it)"
-  value       = module.dns.name_servers
+output "route53_zone_id" {
+  description = "Hosted zone id used for records"
+  value       = module.dns.zone_id
 }
 
 output "acm_validation_records" {

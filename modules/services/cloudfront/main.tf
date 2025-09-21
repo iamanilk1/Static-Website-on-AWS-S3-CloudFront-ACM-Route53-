@@ -31,7 +31,7 @@ resource "aws_cloudfront_distribution" "this" {
   comment             = var.comment
   default_root_object = var.default_root_object
 
-  aliases = var.aliases
+  aliases = var.use_default_certificate ? [] : var.aliases
 
   origin {
     domain_name = var.s3_domain_name
@@ -64,10 +64,10 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   viewer_certificate {
-    acm_certificate_arn            = var.acm_certificate_arn
-    ssl_support_method             = "sni-only"
+    acm_certificate_arn            = var.use_default_certificate ? null : var.acm_certificate_arn
+    ssl_support_method             = var.use_default_certificate ? null : "sni-only"
     minimum_protocol_version       = var.minimum_protocol_version
-    cloudfront_default_certificate = false
+    cloudfront_default_certificate = var.use_default_certificate
   }
 
   tags = var.tags
