@@ -1,5 +1,7 @@
 # Scenario 3 — Static Website on AWS (S3 + CloudFront + ACM + Route53)
 
+**🌐 You can browse the website at https://www.iamanilk.space**
+
 This scenario provides a reusable, service-wise Terraform module setup and an example `dev` environment that deploys a secure, scalable static website (primary region defaults to ap-south-1):
 
 - S3 bucket for website content (private)
