@@ -19,13 +19,13 @@ variable "aws_region" {
 variable "domain_name" {
   description = "Apex domain name (e.g., example.com)"
   type        = string
-  default     = "iamanilk.com"
+  default     = "iamanilk.space"
 }
 
 variable "hosted_zone_name" {
   description = "Hosted zone name (e.g., example.com)"
   type        = string
-  default     = "iamanilk.com"
+  default     = "iamanilk.space"
 }
 
 variable "hosted_zone_id" {
