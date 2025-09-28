@@ -4,6 +4,7 @@
 
 **Note: Due to domain cost considerations, a single domain was used for testing all scenarios. Currently, all three scenarios are offline, but each can be fully deployed using the provided Terraform scripts.**
 
+## Overview
 This scenario provides a reusable, service-wise Terraform module setup and an example `dev` environment that deploys a secure, scalable static website (primary region defaults to ap-south-1):
 
 - S3 bucket for website content (private)
